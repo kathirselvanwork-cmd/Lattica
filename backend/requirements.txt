@@ -1,0 +1,24 @@
+# Lattica Backend Dependencies
+# ============================
+
+# Web framework
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+
+# Database ORM
+sqlalchemy>=2.0.0
+aiosqlite>=0.20.0      # Async SQLite driver for SQLAlchemy
+
+# TLS/SSL scanning engine — the core detection layer
+sslyze>=6.0.0
+
+# Claude API — powers the agentic remediation layer (Day 5)
+# Users can bring their own API key or use the app-provided default
+anthropic>=0.52.0
+
+# CORS support for React frontend
+# (included in fastapi, but explicitly noting it here)
+
+# Utilities
+pydantic>=2.0.0         # Already a FastAPI dep, but pinning for clarity
+python-dotenv>=1.0.0    # For loading .env config (API keys, etc.)

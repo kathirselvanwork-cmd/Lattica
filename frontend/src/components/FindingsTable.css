@@ -1,0 +1,206 @@
+/* FindingsTable — results display */
+
+.findings-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Scan header */
+.scan-header {
+  padding: 1.25rem 1.5rem 0.75rem;
+}
+
+.scan-header h2 {
+  margin: 0 0 0.35rem 0;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.scan-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Severity summary bar — the four colored chips at the top */
+.severity-summary {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.5rem 1.5rem 1rem;
+}
+
+.severity-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.severity-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.severity-count {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.severity-label {
+  text-transform: capitalize;
+}
+
+/* Table */
+.findings-table-wrapper {
+  overflow-x: auto;
+}
+
+.findings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.findings-table thead {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.findings-table th {
+  padding: 0.6rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.findings-table td {
+  padding: 0.6rem 1rem;
+}
+
+/* Clickable rows */
+.finding-row {
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.1s;
+}
+
+.finding-row:hover {
+  background: var(--hover);
+}
+
+/* Severity badge */
+.severity-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.finding-type {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.finding-value {
+  font-family: "SF Mono", "Fira Code", "Fira Mono", monospace;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+.finding-score {
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.finding-exposure {
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* Expanded details row */
+.finding-details-row {
+  background: var(--bg);
+}
+
+.finding-details-row td {
+  padding: 0;
+}
+
+.finding-details {
+  padding: 0.75rem 1rem 0.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-item {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.detail-item strong {
+  color: var(--text-primary);
+  margin-right: 0.35rem;
+}
+
+.migration-notes {
+  background: var(--surface);
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  border-left: 3px solid var(--accent);
+}
+
+/* Loading and error states */
+.findings-loading,
+.findings-error {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 3rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.findings-error {
+  border-color: #ef4444;
+}
+
+.findings-error h3 {
+  color: #ef4444;
+  margin: 0 0 0.5rem 0;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
