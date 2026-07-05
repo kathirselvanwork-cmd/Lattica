@@ -16,7 +16,17 @@ load_dotenv()
 class Settings:
     """Central config — reads from environment variables."""
 
-    # Anthropic API key: app-level default, overridable per-request
+    # --- LLM Remediation Provider ---
+    # Default provider for AI-powered remediation: gemini, openai, claude, ollama
+    REMEDIATION_PROVIDER: str = os.getenv("REMEDIATION_PROVIDER", "gemini")
+
+    # API key for the default provider (users can override per-request via the UI)
+    REMEDIATION_API_KEY: str = os.getenv("REMEDIATION_API_KEY", "")
+
+    # Optional model override for the default provider
+    REMEDIATION_MODEL: str = os.getenv("REMEDIATION_MODEL", "")
+
+    # Legacy: Anthropic API key, used as fallback if REMEDIATION_API_KEY not set
     ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
 
     # SQLite database path

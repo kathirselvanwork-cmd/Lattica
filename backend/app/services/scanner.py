@@ -230,6 +230,7 @@ def _extract_certificate_findings(result) -> list[RawFinding]:
     equally fast to a quantum computer.
     """
     findings = []
+    seen_certs = set()  # Deduplicate — cert chains often reuse key types and sig algos
 
     try:
         cert_attempt = result.scan_result.certificate_info
@@ -246,39 +247,34 @@ def _extract_certificate_findings(result) -> list[RawFinding]:
             key_type = type(pub_key).__name__  # e.g., "_RSAPublicKey", "_EllipticCurvePublicKey"
 
             # Normalize the key type name for readability
+            cert_value = None
             if "RSA" in key_type:
-                key_size = pub_key.key_size
-                findings.append(RawFinding(
-                    finding_type="certificate",
-                    value=f"RSA-{key_size}",
-                ))
+                cert_value = f"RSA-{pub_key.key_size}"
             elif "EllipticCurve" in key_type or "EC" in key_type:
-                key_size = pub_key.key_size
-                findings.append(RawFinding(
-                    finding_type="certificate",
-                    value=f"ECDSA-{key_size}",
-                ))
+                cert_value = f"ECDSA-{pub_key.key_size}"
             elif "Ed25519" in key_type:
-                findings.append(RawFinding(
-                    finding_type="certificate",
-                    value="Ed25519",
-                ))
+                cert_value = "Ed25519"
             elif "Ed448" in key_type:
-                findings.append(RawFinding(
-                    finding_type="certificate",
-                    value="Ed448",
-                ))
+                cert_value = "Ed448"
             else:
+                cert_value = f"Unknown ({key_type})"
+
+            # Only add if we haven't seen this exact key type+size before
+            if cert_value not in seen_certs:
+                seen_certs.add(cert_value)
                 findings.append(RawFinding(
                     finding_type="certificate",
-                    value=f"Unknown ({key_type})",
+                    value=cert_value,
                 ))
 
-            # Also capture the signature algorithm used on the cert
+            # Also capture the signature algorithm, deduplicated
             sig_algo = cert.signature_algorithm_oid._name if hasattr(cert.signature_algorithm_oid, '_name') else str(cert.signature_algorithm_oid.dotted_string)
-            findings.append(RawFinding(
-                finding_type="certificate",
-                value=f"Signature: {sig_algo}",
-            ))
+            sig_value = f"Signature: {sig_algo}"
+            if sig_value not in seen_certs:
+                seen_certs.add(sig_value)
+                findings.append(RawFinding(
+                    finding_type="certificate",
+                    value=sig_value,
+                ))
 
     return findings

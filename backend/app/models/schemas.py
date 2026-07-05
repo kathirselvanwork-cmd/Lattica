@@ -82,3 +82,35 @@ class ScanSummary(BaseModel):
     completed_at: datetime | None
 
     model_config = {"from_attributes": True}
+
+
+# ---------------------------------------------------------------------------
+# Remediation schemas — AI-powered deep dive on a finding
+# ---------------------------------------------------------------------------
+
+class RemediationRequest(BaseModel):
+    """POST /scans/{id}/findings/{id}/remediate — request body."""
+    # LLM provider selection
+    provider: str = Field(
+        default="gemini",
+        description="LLM provider to use: gemini, openai, claude, or ollama",
+    )
+    api_key: str = Field(
+        default="",
+        description="API key for the LLM provider (not needed for Ollama). "
+                    "Falls back to the app-level key from .env if not provided.",
+    )
+    model: str = Field(
+        default="",
+        description="Optional model override (each provider has a sensible default)",
+    )
+
+
+class RemediationResponse(BaseModel):
+    """Structured AI remediation response."""
+    summary: str             # 1–2 sentence executive summary
+    risk_explanation: str    # Why this finding matters for HNDL
+    migration_steps: str     # Step-by-step migration plan
+    priority: str            # Recommended priority and timeline
+    provider: str            # Which LLM generated this (transparency)
+    model: str               # Specific model used

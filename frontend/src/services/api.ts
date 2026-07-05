@@ -6,7 +6,13 @@
  */
 
 import axios from "axios";
-import type { Scan, ScanCreate, ScanSummary } from "../types";
+import type {
+  Scan,
+  ScanCreate,
+  ScanSummary,
+  RemediationRequest,
+  RemediationResponse,
+} from "../types";
 
 // Base URL for the FastAPI backend — Vite dev server proxies aren't
 // needed since we have CORS configured on the backend.
@@ -41,5 +47,22 @@ export async function listScans(): Promise<ScanSummary[]> {
  */
 export async function getScan(scanId: number): Promise<Scan> {
   const { data } = await api.get<Scan>(`/scans/${scanId}`);
+  return data;
+}
+
+/**
+ * Request an AI-powered deep dive remediation for a specific finding.
+ * Sends the finding context to the configured LLM provider and returns
+ * a structured remediation plan.
+ */
+export async function requestRemediation(
+  scanId: number,
+  findingId: number,
+  payload: RemediationRequest
+): Promise<RemediationResponse> {
+  const { data } = await api.post<RemediationResponse>(
+    `/scans/${scanId}/findings/${findingId}/remediate`,
+    payload
+  );
   return data;
 }

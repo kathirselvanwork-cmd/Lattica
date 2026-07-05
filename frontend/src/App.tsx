@@ -14,6 +14,8 @@ import { useState, useEffect, useCallback } from "react";
 import ScanForm from "./components/ScanForm";
 import FindingsTable from "./components/FindingsTable";
 import ScanHistory from "./components/ScanHistory";
+import LLMSettings from "./components/LLMSettings";
+import type { LLMConfig } from "./components/LLMSettings";
 import { createScan, listScans, getScan } from "./services/api";
 import type { Scan, ScanCreate, ScanSummary } from "./types";
 import "./App.css";
@@ -30,6 +32,13 @@ export default function App() {
 
   // Error state
   const [error, setError] = useState<string | null>(null);
+
+  // LLM provider config for AI remediation (stored in state, not persisted)
+  const [llmConfig, setLlmConfig] = useState<LLMConfig>({
+    provider: "gemini",
+    apiKey: "",
+    model: "",
+  });
 
   // Load scan history on mount
   useEffect(() => {
@@ -88,6 +97,7 @@ export default function App() {
         {/* Left sidebar — form + history */}
         <aside className="sidebar">
           <ScanForm onSubmit={handleScan} isLoading={isScanning} />
+          <LLMSettings config={llmConfig} onChange={setLlmConfig} />
           <ScanHistory
             scans={scanList}
             activeScanId={activeScan?.id ?? null}
@@ -105,7 +115,7 @@ export default function App() {
           )}
 
           {activeScan ? (
-            <FindingsTable scan={activeScan} />
+            <FindingsTable scan={activeScan} llmConfig={llmConfig} />
           ) : (
             <div className="empty-state">
               <h2>No scan selected</h2>

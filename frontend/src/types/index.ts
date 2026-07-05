@@ -44,3 +44,20 @@ export interface ScanSummary {
   created_at: string;
   completed_at: string | null;
 }
+
+// --- Remediation types (AI deep dive) ---
+
+export interface RemediationRequest {
+  provider: string;  // "gemini", "openai", "claude", "ollama"
+  api_key: string;   // User-provided key (optional, falls back to server .env)
+  model: string;     // Optional model override
+}
+
+export interface RemediationResponse {
+  summary: string;           // 1–2 sentence executive summary
+  risk_explanation: string;  // Why this finding matters for HNDL
+  migration_steps: string;   // Step-by-step migration plan
+  priority: string;          // Recommended priority and timeline
+  provider: string;          // Which LLM generated this
+  model: string;             // Specific model used
+}

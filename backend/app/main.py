@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.database import init_db
-from app.routers import scans
+from app.routers import scans, remediation
 
 # ---------------------------------------------------------------------------
 # App setup
@@ -38,6 +38,7 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 
 app.include_router(scans.router, prefix="/scans", tags=["scans"])
+app.include_router(remediation.router, prefix="/scans", tags=["remediation"])
 
 
 # ---------------------------------------------------------------------------
