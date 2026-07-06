@@ -16,7 +16,7 @@ Both paths hit the same backend, same scan engine, same scoring. The only differ
 ## Quick Start
 
 ```bash
-git clone https://github.com/<your-username>/lattica.git
+git clone https://github.com/kathirselvanwork-cmd/lattica.git
 cd lattica
 
 # Backend only (required for both paths)
