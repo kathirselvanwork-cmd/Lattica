@@ -14,10 +14,42 @@ Scan a domain's TLS configuration for quantum-vulnerable cryptography using the 
    ```
    Wait a few seconds and retry the health check.
 
-2. **Parse the user's input** — The user may provide:
-   - Just a domain: `/scan example.com` → use defaults S=3, R=3
-   - Domain with parameters: `/scan example.com S=5 R=4`
-   - If no domain is provided, ask for one.
+2. **Parse the user's input** from $ARGUMENTS:
+   - **If domain + S + R provided** (e.g., `/scan example.com S=5 R=4`): use them directly, skip to step 3.
+   - **If only domain provided** (e.g., `/scan example.com`): proceed to step 2a to gather S and R interactively.
+   - **If no domain provided** (e.g., `/scan`): ask for the domain first, then proceed to step 2a.
+
+2a. **Gather HNDL parameters interactively** — Present each scale and ask the user to pick:
+
+   **Data Sensitivity (S):**
+   ```
+   What type of data flows over this connection?
+
+     1 — Public:       Open data, no confidentiality requirement
+     2 — Internal:     Internal business data, low sensitivity
+     3 — Confidential: Business-sensitive, contractual obligations
+     4 — Restricted:   PII, financial data, trade secrets
+     5 — Critical:     National security, health records, regulated financial
+
+   Enter 1–5:
+   ```
+
+   Wait for the user's answer. Then ask:
+
+   **Retention Horizon (R):**
+   ```
+   How long must this data stay confidential?
+
+     1 — Ephemeral:    Discarded within days
+     2 — Short-term:   6–12 months
+     3 — Medium-term:  1–3 years
+     4 — Long-term:    3–7 years
+     5 — Regulatory:   7+ years (HIPAA, SOX, GDPR, etc.)
+
+   Enter 1–5:
+   ```
+
+   Wait for the user's answer before proceeding.
 
 3. **Run the scan** via the Lattica API:
    ```bash
@@ -58,7 +90,9 @@ Scan a domain's TLS configuration for quantum-vulnerable cryptography using the 
 
 $ARGUMENTS will contain the user's input after `/scan`. Parse it for:
 - The domain name (first argument)
-- Optional `S=<1-5>` parameter (default: 3)
-- Optional `R=<1-5>` parameter (default: 3)
+- Optional `S=<1-5>` parameter
+- Optional `R=<1-5>` parameter
+
+If S and R are not provided, gather them interactively — do NOT silently default to 3.
 
 User input: $ARGUMENTS

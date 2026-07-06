@@ -30,6 +30,7 @@ export default function ScanHistory({
   if (scans.length === 0) {
     return (
       <div className="scan-history empty">
+        <h3>Scan History</h3>
         <p>No scans yet. Run your first scan above.</p>
       </div>
     );
@@ -42,8 +43,8 @@ export default function ScanHistory({
         {scans.map((scan) => (
           <li
             key={scan.id}
-            className={`scan-item ${scan.id === activeScanId ? "active" : ""}`}
-            onClick={() => onSelect(scan.id)}
+            className={`scan-item ${scan.id === activeScanId ? "active" : ""} ${scan.status !== "completed" ? "non-selectable" : ""}`}
+            onClick={() => scan.status === "completed" && onSelect(scan.id)}
           >
             {/* Status dot */}
             <span

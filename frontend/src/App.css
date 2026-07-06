@@ -136,7 +136,7 @@ body {
 }
 
 /* --- Responsive: stack on narrow screens --- */
-@media (max-width: 800px) {
+@media (max-width: 900px) {
   .app-layout {
     flex-direction: column;
   }

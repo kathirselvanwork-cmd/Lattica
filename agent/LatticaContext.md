@@ -209,12 +209,49 @@ If it returns `{"status":"ok","service":"lattica"}`, proceed. If it fails:
 
 ### 2. Gather Parameters
 
-Ask the user for:
-- **Domain** to scan (required)
-- **Data Sensitivity (S)** — 1–5, explain the scale if they're unsure
-- **Retention Horizon (R)** — 1–5, explain the scale if they're unsure
+**If the user provided S and R values** (e.g., "scan example.com S=4 R=3"), use them directly.
 
-If the user just gives a domain, use sensible defaults: S=3, R=3.
+**If the user only gave a domain** (e.g., "scan example.com"), walk them through each parameter
+interactively. Do NOT silently default — the whole point of HNDL is that these values shape the
+risk assessment. Present the scales and ask:
+
+**Step A — Data Sensitivity (S):**
+```
+What type of data flows over this connection?
+
+  1 — Public:       Open data, no confidentiality requirement
+  2 — Internal:     Internal business data, low sensitivity
+  3 — Confidential: Business-sensitive, contractual obligations
+  4 — Restricted:   PII, financial data, trade secrets
+  5 — Critical:     National security, health records, regulated financial
+
+Enter 1–5:
+```
+
+**Step B — Retention Horizon (R):**
+```
+How long must this data stay confidential?
+
+  1 — Ephemeral:    Discarded within days
+  2 — Short-term:   6–12 months
+  3 — Medium-term:  1–3 years
+  4 — Long-term:    3–7 years
+  5 — Regulatory:   7+ years (HIPAA, SOX, GDPR, etc.)
+
+Enter 1–5:
+```
+
+Wait for the user to answer each question before proceeding. This ensures the user
+understands what S and R mean — which makes the scores meaningful when they see them.
+
+**Contradictory combinations:** If the user picks values that seem contradictory (e.g., S=1
+"Public — no confidentiality" with R=5 "Regulatory — 7+ years"), flag it before scanning:
+
+> "Just a note — S=1 means the data has no confidentiality requirement, but R=5 means it must
+> stay confidential for 7+ years. That's an unusual pairing. Would you like to adjust, or is
+> this intentional (e.g., public data with a regulatory audit trail)?"
+
+Accept whatever the user decides — don't block the scan. The flag is educational, not a gate.
 
 ### 3. Run the Scan
 
@@ -235,10 +272,41 @@ Display the structured summary (see agent output format), then a findings table 
 - HNDL risk score with formula breakdown (S×R×E)
 - Tier 1 guidance (NIST deadline, PQC replacement)
 
+**PQC Adoption Status:** After the findings table, add a prominent callout showing whether any
+PQC-ready primitives were detected. For example:
+
+```
+PQC Adoption Status: NONE DETECTED
+No hybrid key exchange (X25519+ML-KEM-768) or PQC certificate signatures (ML-DSA)
+were found. This domain has not yet begun the post-quantum transition.
+```
+
+If PQC primitives ARE detected (e.g., hybrid key exchange), call that out as a positive signal.
+This is arguably the headline finding for a PQC readiness tool — make it visible, not buried.
+
+**"What if S was higher?" teaser:** When S is low (1 or 2), include a brief sensitivity
+analysis showing what the scores WOULD be at a higher S. For example:
+
+> "With your current S=1, peak risk is 20/125. If this were S=4 (PII/financial data),
+> those same 6 static RSA suites would score 80/125 (Critical) — above the immediate
+> migration threshold."
+
+This demonstrates the HNDL model's power without requiring a second scan.
+
+**Grouping cipher suites:** When grouping similar findings to save space, preserve the key
+exchange vs. signature algorithm distinction. For example, don't collapse `TLS_ECDHE_RSA_*`
+and `TLS_ECDHE_ECDSA_*` into a single `TLS_ECDHE_*` group — the RSA vs ECDSA distinction
+maps to different certificate chains and has different migration paths. Group within those
+sub-families instead.
+
 ### 5. Provide AI Remediation (Deep Dive)
 
 For every **critical** and **high** finding, and any others the user asks about, present
-both tiers clearly separated:
+both tiers clearly separated. **If no critical or high findings exist** (e.g., because S is low),
+apply Tier 1/Tier 2 analysis to the highest-scoring findings regardless of severity bucket —
+the user still deserves expert analysis on their worst exposures even if the scores are moderate.
+
+Present each deep dive with both tiers clearly separated:
 
 ```
 ── Finding: <value> ──────────────────────────

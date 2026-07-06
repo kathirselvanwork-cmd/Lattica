@@ -127,6 +127,33 @@ export default function FindingsTable({ scan, llmConfig }: FindingsTableProps) {
     );
   }
 
+  // Scan completed but found nothing — show a clean empty state
+  if (scan.findings.length === 0) {
+    return (
+      <div className="findings-container">
+        <div className="scan-header">
+          <h2>{scan.domain}</h2>
+          <div className="scan-meta">
+            <span>0 findings</span>
+            <span>
+              {scan.completed_at
+                ? new Date(scan.completed_at).toLocaleString()
+                : ""}
+            </span>
+          </div>
+        </div>
+        <div className="empty-state" style={{ margin: "2rem" }}>
+          <h2>No findings</h2>
+          <p>
+            No quantum-vulnerable cryptography was detected on {scan.domain}.
+            This may mean the target has a very minimal TLS configuration or
+            is already using PQC-ready settings.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="findings-container">
       {/* Scan summary header */}
@@ -146,6 +173,7 @@ export default function FindingsTable({ scan, llmConfig }: FindingsTableProps) {
       <div className="explainer-section">
         <button
           className="explainer-toggle"
+          aria-expanded={showExplainer}
           onClick={() => setShowExplainer(!showExplainer)}
         >
           {showExplainer ? "Hide" : "How is this scored?"}
@@ -270,6 +298,7 @@ export default function FindingsTable({ scan, llmConfig }: FindingsTableProps) {
                   remediation={remediations[finding.id] || null}
                   isLoadingRemediation={loadingIds.has(finding.id)}
                   remediationError={remediationErrors[finding.id] || null}
+                  hasApiKey={llmConfig.provider === "ollama" || !!llmConfig.apiKey}
                 />
               ))}
           </tbody>
@@ -293,6 +322,7 @@ interface FindingRowProps {
   remediation: RemediationResponse | null;
   isLoadingRemediation: boolean;
   remediationError: string | null;
+  hasApiKey: boolean;
 }
 
 function FindingRow({
@@ -305,6 +335,7 @@ function FindingRow({
   remediation,
   isLoadingRemediation,
   remediationError,
+  hasApiKey,
 }: FindingRowProps) {
   return (
     <>
@@ -314,7 +345,7 @@ function FindingRow({
           <span
             className="severity-badge"
             style={{
-              background: SEVERITY_COLORS[finding.severity_bucket],
+              background: SEVERITY_COLORS[finding.severity_bucket] ?? "#6b7280",
             }}
           >
             {finding.severity_bucket}
@@ -369,12 +400,16 @@ function FindingRow({
                 {!remediation && !isLoadingRemediation && (
                   <button
                     className="deep-dive-btn"
+                    disabled={!hasApiKey}
+                    title={!hasApiKey ? "Configure an LLM provider in the sidebar first" : undefined}
                     onClick={(e) => {
                       e.stopPropagation();
                       onDeepDive();
                     }}
                   >
-                    🤖 AI Deep Dive — Get Detailed Remediation Plan
+                    {hasApiKey
+                      ? "AI Deep Dive — Get Detailed Remediation Plan"
+                      : "AI Deep Dive — Configure LLM in sidebar first"}
                   </button>
                 )}
 

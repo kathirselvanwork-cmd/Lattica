@@ -78,6 +78,7 @@ export default function App() {
       setActiveScan(result);
       setError(null);
     } catch {
+      setActiveScan(null);
       setError("Failed to load scan results");
     }
   }, []);

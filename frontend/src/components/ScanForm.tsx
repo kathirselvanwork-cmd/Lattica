@@ -36,17 +36,32 @@ interface ScanFormProps {
   isLoading: boolean;
 }
 
+// Simple domain validation — allows subdomains, rejects empty and garbage input
+const DOMAIN_RE = /^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$/;
+
 export default function ScanForm({ onSubmit, isLoading }: ScanFormProps) {
   const [domain, setDomain] = useState("");
   const [sensitivity, setSensitivity] = useState(3);
   const [retention, setRetention] = useState(3);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!domain.trim()) return;
 
+    // Auto-strip common user mistakes: "https://example.com/path" → "example.com"
+    const cleaned = domain.trim()
+      .replace(/^https?:\/\//, "")
+      .replace(/\/.*$/, "")
+      .replace(/:.*$/, "");
+
+    if (!cleaned || !DOMAIN_RE.test(cleaned)) {
+      setValidationError("Enter a plain domain like api.example.com");
+      return;
+    }
+
+    setValidationError(null);
     onSubmit({
-      domain: domain.trim(),
+      domain: cleaned,
       data_sensitivity: sensitivity,
       retention_horizon: retention,
     });
@@ -64,10 +79,16 @@ export default function ScanForm({ onSubmit, isLoading }: ScanFormProps) {
           type="text"
           placeholder="e.g., api.example.com"
           value={domain}
-          onChange={(e) => setDomain(e.target.value)}
+          onChange={(e) => {
+            setDomain(e.target.value);
+            if (validationError) setValidationError(null);
+          }}
           disabled={isLoading}
           autoFocus
         />
+        {validationError && (
+          <span className="validation-error">{validationError}</span>
+        )}
       </div>
 
       {/* Data Sensitivity slider — the "S" in S×R×E */}
@@ -87,6 +108,7 @@ export default function ScanForm({ onSubmit, isLoading }: ScanFormProps) {
           value={sensitivity}
           onChange={(e) => setSensitivity(Number(e.target.value))}
           disabled={isLoading}
+          aria-valuetext={SENSITIVITY_LABELS[sensitivity]}
         />
         <div className="slider-range">
           <span>1 — Public</span>
@@ -111,6 +133,7 @@ export default function ScanForm({ onSubmit, isLoading }: ScanFormProps) {
           value={retention}
           onChange={(e) => setRetention(Number(e.target.value))}
           disabled={isLoading}
+          aria-valuetext={RETENTION_LABELS[retention]}
         />
         <div className="slider-range">
           <span>1 — Ephemeral</span>
@@ -120,7 +143,7 @@ export default function ScanForm({ onSubmit, isLoading }: ScanFormProps) {
 
       {/* Submit */}
       <button type="submit" disabled={isLoading || !domain.trim()}>
-        {isLoading ? "Scanning..." : "Scan"}
+        {isLoading ? "Scanning — this takes 5–15 s…" : "Scan"}
       </button>
     </form>
   );

@@ -54,6 +54,14 @@
   color: var(--text-muted);
 }
 
+/* Domain validation error */
+.validation-error {
+  display: block;
+  color: #fca5a5;
+  font-size: 0.78rem;
+  margin-top: 0.3rem;
+}
+
 /* Slider styling */
 .form-group input[type="range"] {
   width: 100%;
