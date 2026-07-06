@@ -203,7 +203,7 @@ curl -s http://localhost:8000/health
 ```
 
 If it returns `{"status":"ok","service":"lattica"}`, proceed. If it fails:
-- Check if the backend needs to be started: `cd ~/Projects/lattica/backend && .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload &`
+- Check if the backend needs to be started. From the `backend/` directory of the Lattica repo: `.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload &`
 - Wait a few seconds and retry the health check.
 - If it still fails, inform the user the backend is not running.
 
@@ -348,7 +348,7 @@ After covering individual findings, provide:
 
 ## Edge Cases
 
-- **Backend not running:** attempt to start it from `~/Projects/lattica/backend/`. If that fails,
+- **Backend not running:** attempt to start it from the `backend/` directory of the Lattica repo. If that fails,
   inform the user and provide startup instructions.
 - **Scan fails:** the API returns `status: "failed"` with an `error_message`. Report the error
   and suggest common fixes (DNS resolution, firewall blocking, domain unreachable).

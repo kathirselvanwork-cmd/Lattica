@@ -35,7 +35,7 @@ until it's loaded. Non-negotiable.
 2. Read `$HOME/.claude/skills/Agents/LatticaContext.md` using the resolved path
 3. If that fails, run `find $HOME/.claude -name "LatticaContext.md"` to locate it
 
-The home directory on this system is `/home/jamiraquai`, NOT `/root/`.
+Do NOT hardcode a home directory path — always resolve it dynamically with `echo $HOME`.
 
 ---
 
