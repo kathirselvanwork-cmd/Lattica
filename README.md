@@ -32,6 +32,15 @@ cd lattica
 ./setup.sh --all
 ```
 
+Then configure your environment:
+
+```bash
+# Edit backend/.env — add your LLM API key if you want AI Deep Dive (optional)
+nano backend/.env
+```
+
+The backend works with zero configuration — scanning, HNDL scoring, and Tier 1 guidance all run without any API keys. The `.env` is only needed if you want Tier 2 AI remediation via the dashboard. The agent path needs no API keys at all.
+
 Then start the backend:
 
 ```bash
@@ -273,6 +282,19 @@ lattica/
 | Python | 3.11+ | Backend |
 | bun | any | Dashboard (frontend) |
 | Claude Code | any | Agent path (optional) |
+
+---
+
+## Disclaimer
+
+**Only scan domains you own or have explicit permission to test.** Lattica uses [sslyze](https://github.com/nabla-c0/sslyze) to perform TLS scans, which involves connecting to the target server and probing its TLS configuration. While this is non-intrusive (it only reads publicly available TLS handshake data), scanning systems without authorization may violate local laws or the target's terms of service.
+
+This tool is intended for:
+- Assessing your own infrastructure's PQC readiness
+- Authorized security assessments and penetration testing
+- Educational and research purposes
+
+The authors are not responsible for misuse of this tool.
 
 ---
 
